@@ -31,8 +31,10 @@ export default function ContentPage({ slug }: { slug: ContentSlug }) {
         />
         <div className="container-app relative z-10 py-16 md:py-24">
           <Reveal>
-            <BackButton className="mb-6" />
-            <span className="eyebrow">LORS</span>
+            <div className="mb-6 flex flex-col items-start gap-5">
+              <BackButton />
+              <span className="eyebrow">LORS</span>
+            </div>
             <h1 className="mt-4 max-w-3xl font-display text-4xl font-bold leading-[1.08] tracking-tight md:text-5xl text-balance">
               {page.title}
             </h1>
