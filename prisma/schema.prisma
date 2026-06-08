@@ -1,0 +1,273 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  image         String?
+  role          String    @default("CUSTOMER")
+  phone         String?
+  commissionRate Int      @default(0)
+  isActive      Boolean   @default(true)
+  primaryBranchId String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  orders        Order[]   @relation("CustomerOrders")
+  createdOrders Order[]   @relation("CreatedOrders")
+  acceptedOrders Order[]  @relation("AcceptedOrders")
+  archivedOrders Order[]  @relation("ArchivedOrders")
+  orderEvents   OrderEvent[]
+  addresses     Address[]
+  primaryBranch Branch?   @relation("StaffPrimaryBranch", fields: [primaryBranchId], references: [id], onDelete: SetNull)
+
+  @@index([role, isActive])
+  @@index([primaryBranchId])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  firstName String
+  lastName  String
+  phone     String
+  country   String?
+  city      String?
+  province  String?
+  district  String?
+  neighborhood String?
+  line1     String
+  zip       String?
+  isDefault Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  number      String      @unique
+  userId      String?
+  createdById String?
+  acceptedById String?
+  branchId    String?
+  promotionCodeId String?
+  status      String      @default("PENDING")
+  source      String      @default("WEBSITE")
+  commissionRate Int      @default(0)
+  subtotal    Int
+  shipping    Int         @default(0)
+  discount    Int         @default(0)
+  total       Int
+  currency    String      @default("TRY")
+  customer    String
+  shippingAdr String
+  note        String?
+  locale      String      @default("tr")
+  idempotencyKey String?  @unique
+  archivedAt  DateTime?
+  archivedById String?
+  archiveReason String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        User?       @relation("CustomerOrders", fields: [userId], references: [id], onDelete: SetNull)
+  createdBy   User?       @relation("CreatedOrders", fields: [createdById], references: [id], onDelete: SetNull)
+  acceptedBy  User?       @relation("AcceptedOrders", fields: [acceptedById], references: [id], onDelete: SetNull)
+  archivedBy  User?       @relation("ArchivedOrders", fields: [archivedById], references: [id], onDelete: SetNull)
+  branch      Branch?     @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  promotionCode PromotionCode? @relation(fields: [promotionCodeId], references: [id], onDelete: SetNull)
+  items       OrderItem[]
+  events      OrderEvent[]
+
+  @@index([acceptedById])
+  @@index([createdById])
+  @@index([branchId])
+  @@index([status, archivedAt])
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  brandSlug String
+  brandName String
+  modelSlug String
+  modelName String
+  fullName  String
+  years     String?
+  bodyType  String?
+  pattern   String @default("sota")
+  material  String @default("hali")
+  color     String
+  piping    String
+  logo      String
+  customLogoUrl String?
+  accessories String @default("[]")
+  setType   String
+  unitPrice Int
+  qty       Int
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+// Compatibility overrides while the static catalog is migrated to VehicleBrand/VehicleModel.
+model CatalogEntry {
+  id          String   @id @default(cuid())
+  brandSlug   String
+  brandName   String
+  modelSlug   String?
+  modelName   String?
+  status      String   @default("AVAILABLE")
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([brandSlug])
+  @@unique([brandSlug, modelSlug])
+}
+
+model Branch {
+  id          String   @id
+  name        String
+  shortName   String
+  address     String
+  phone       String
+  mapsUrl     String?
+  hours       String
+  googlePlaceId String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  staff       User[]   @relation("StaffPrimaryBranch")
+  orders      Order[]
+}
+
+model OrderEvent {
+  id        String   @id @default(cuid())
+  orderId   String
+  actorId   String?
+  type      String
+  payload   String?
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+  @@index([actorId])
+}
+
+model VehicleBrand {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  status    String   @default("AVAILABLE")
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  models    VehicleModel[]
+}
+
+model VehicleModel {
+  id        String   @id @default(cuid())
+  brandId   String
+  slug      String
+  name      String
+  fullName  String
+  years     String?
+  bodyType  String?
+  status    String   @default("AVAILABLE")
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  brand     VehicleBrand @relation(fields: [brandId], references: [id], onDelete: Restrict)
+
+  @@unique([brandId, slug])
+  @@index([status])
+}
+
+model ProductOption {
+  id        String   @id @default(cuid())
+  group     String
+  value     String
+  label     String
+  colorHex  String?
+  priceDelta Int     @default(0)
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([group, value])
+  @@index([group, isActive])
+}
+
+model PromotionCode {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  type        String
+  amount      Int
+  minSubtotal Int      @default(0)
+  maxUses     Int?
+  usedCount   Int      @default(0)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      Order[]
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  authorName  String
+  authorImage String?
+  rating      Int
+  text        String
+  sourceUrl   String
+  googleReviewId String? @unique
+  isVerified  Boolean  @default(false)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
