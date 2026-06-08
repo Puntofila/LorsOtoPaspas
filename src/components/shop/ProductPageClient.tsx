@@ -211,7 +211,7 @@ export default function ProductPageClient({ brand, model }: { brand: Brand; mode
                 <span className="mb-2 block font-medium text-fg">Özel logoyu yükle</span>
                 <input
                   type="file"
-                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  accept="image/png,image/jpeg,image/webp"
                   disabled={uploadingLogo}
                   onChange={async (event) => {
                     const file = event.target.files?.[0];
@@ -227,7 +227,7 @@ export default function ProductPageClient({ brand, model }: { brand: Brand; mode
                   }}
                 />
                 <span className="mt-2 block text-xs text-fg-mute">
-                  {uploadingLogo ? "Yükleniyor..." : customLogoUrl ? "Logo yüklendi" : "PNG, JPG, WebP veya SVG · en fazla 3 MB"}
+                  {uploadingLogo ? "Yükleniyor..." : customLogoUrl ? "Logo yüklendi" : "PNG, JPG veya WebP · en fazla 3 MB"}
                 </span>
               </label>
             )}

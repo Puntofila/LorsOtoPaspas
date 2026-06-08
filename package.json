@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && prisma migrate deploy && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "test": "tsx --test tests/admin-workflow.test.ts tests/site-ui.test.ts",
     "lint": "next lint",

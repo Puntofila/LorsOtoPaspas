@@ -5,6 +5,19 @@ import { authOptions } from "@/lib/auth/config";
 import { prisma } from "@/lib/db/prisma";
 import { rateLimitResponse } from "@/lib/security/rateLimit";
 import { calculatePromotionDiscount, isPromotionUsable } from "@/lib/orders/promotion";
+import { PRODUCT_OPTIONS } from "@/lib/catalog/product-options";
+
+// Server-side price source of truth. Mirrors ProductPageClient:
+// unitPrice = set.basePrice + logo.addon. Never trust client-supplied prices.
+const SET_PRICE = new Map<string, number>(PRODUCT_OPTIONS.sets.map((s) => [s.id, s.basePrice]));
+const LOGO_ADDON = new Map<string, number>(PRODUCT_OPTIONS.logos.map((l) => [l.id, l.addon]));
+
+function resolveUnitPrice(setType: string, logo: string): number | null {
+  const base = SET_PRICE.get(setType);
+  const addon = LOGO_ADDON.get(logo);
+  if (base === undefined || addon === undefined) return null;
+  return base + addon;
+}
 
 const itemSchema = z.object({
   brandSlug: z.string(),
@@ -22,7 +35,7 @@ const itemSchema = z.object({
   customLogoUrl: z.string().url().optional().or(z.literal("")),
   accessories: z.array(z.enum(["heelPad", "logo"])).max(2).default([]),
   setType: z.string(),
-  unitPrice: z.number().int().nonnegative().max(1_000_000),
+  // unitPrice is intentionally NOT accepted from the client; the server computes it.
   qty: z.number().int().positive().max(99),
 });
 
@@ -76,7 +89,17 @@ export async function POST(req: Request) {
   const branch = await prisma.branch.findFirst({ where: { id: branchId, isActive: true }, select: { id: true } });
   if (!branch) return NextResponse.json({ error: "invalid_branch" }, { status: 400 });
 
-  const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.qty, 0);
+  // Resolve every line price server-side; reject unknown set/logo combinations.
+  const pricedItems: Array<(typeof items)[number] & { unitPrice: number }> = [];
+  for (const item of items) {
+    const unitPrice = resolveUnitPrice(item.setType, item.logo);
+    if (unitPrice === null) {
+      return NextResponse.json({ error: "invalid_pricing" }, { status: 400 });
+    }
+    pricedItems.push({ ...item, unitPrice });
+  }
+
+  const subtotal = pricedItems.reduce((sum, item) => sum + item.unitPrice * item.qty, 0);
   let promotion: Awaited<ReturnType<typeof prisma.promotionCode.findUnique>> = null;
   let discount = 0;
   if (parsed.data.promotionCode) {
@@ -107,7 +130,7 @@ export async function POST(req: Request) {
         note,
         locale,
         items: {
-          create: items.map((item) => ({
+          create: pricedItems.map((item) => ({
             ...item,
             customLogoUrl: item.customLogoUrl || null,
             accessories: JSON.stringify(item.accessories),
