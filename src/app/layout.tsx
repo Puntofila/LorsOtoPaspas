@@ -19,13 +19,13 @@ export const metadata: Metadata = {
     siteName: "LORS OTO PASPAS",
     title: "LORS OTO PASPAS",
     description: "Model-specific premium car mats. Custom colors, logos, fast production.",
-    images: [{ url: "/banners/og.jpg", width: 1200, height: 630, alt: "LORS OTO PASPAS" }],
+    images: [{ url: "/banners/hero.jpg", width: 1200, height: 630, alt: "LORS OTO PASPAS" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "LORS OTO PASPAS",
     description: "Model-specific premium car mats. Custom colors, logos, fast production.",
-    images: ["/banners/og.jpg"],
+    images: ["/banners/hero.jpg"],
   },
 };
 

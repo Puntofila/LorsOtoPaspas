@@ -2,59 +2,28 @@
 
 import { useState } from "react";
 
-const SIMPLEICON_SLUG: Record<string, string> = {
-  audi: "audi",
-  bmw: "bmw",
-  "mercedes-benz": "mercedes",
-  volkswagen: "volkswagen",
-  toyota: "toyota",
-  ford: "ford",
-  honda: "honda",
-  hyundai: "hyundai",
-  kia: "kia",
-  fiat: "fiat",
-  renault: "renault",
-  peugeot: "peugeot",
-  citroen: "citroen",
-  porsche: "porsche",
-  ferrari: "ferrari",
-  jaguar: "jaguar",
-  "land-rover": "landrover",
-  lexus: "lexus",
-  mazda: "mazda",
-  nissan: "nissan",
-  opel: "opel",
-  seat: "seatti",
-  skoda: "skoda",
-  subaru: "subaru",
-  suzuki: "suzuki",
-  tesla: "tesla",
-  volvo: "volvo",
-  mini: "mini",
-  mitsubishi: "mitsubishi",
-  cadillac: "cadillac",
-  chevrolet: "chevrolet",
-  chrysler: "chrysler",
-  dodge: "dodge",
-  jeep: "jeep",
-  maserati: "maserati",
-  bentley: "bentley",
-  "rolls-royce": "rollsroyce",
-  "alfa-romeo": "alfaromeo",
-  dacia: "dacia",
-  cupra: "cupra",
-  "aston-martin": "astonmartin",
-  bugatti: "bugatti",
-  lamborghini: "lamborghini",
-  mclaren: "mclaren",
-  infiniti: "infiniti",
-  acura: "acura",
-  buick: "buick",
-  gmc: "gmc",
-  lincoln: "lincoln",
-  daihatsu: "daihatsu",
-  byd: "byd",
-};
+// Real automotive brand logos (colored PNGs on transparent background).
+// Source: car-logos-dataset — slugs match our brand slugs directly, so no
+// per-brand mapping table is needed. A handful of niche brands (aion, togg,
+// yoyo, etc.) aren't in the set and fall back to the tinted initials tile.
+const LOGO_BASE =
+  "https://raw.githubusercontent.com/filippofilip95/car-logos-dataset/master/logos/optimized";
+
+// Brands known to be absent from the dataset — skip the network round-trip and
+// render the initials fallback immediately.
+const NO_LOGO = new Set([
+  "aion",
+  "dfsk",
+  "jaecoo",
+  "kgm",
+  "khazar",
+  "relive",
+  "seres",
+  "skywell",
+  "swm",
+  "togg",
+  "yoyo",
+]);
 
 const ACCENT_TINT: Record<string, string> = {
   bmw: "#1c69d4",
@@ -65,7 +34,6 @@ const ACCENT_TINT: Record<string, string> = {
   lamborghini: "#a08b3f",
   bentley: "#103138",
   "rolls-royce": "#68242a",
-  bugatti: "#0d2c54",
   "alfa-romeo": "#a82d2d",
   jaguar: "#1a4732",
   "land-rover": "#005a2b",
@@ -99,10 +67,9 @@ const ACCENT_TINT: Record<string, string> = {
   maserati: "#1a2a4a",
   lexus: "#3a3a3a",
   infiniti: "#3a3a3a",
-  buick: "#a01010",
-  gmc: "#c8102e",
   byd: "#cc0000",
   togg: "#5b21b6",
+  aion: "#0a7d6e",
 };
 
 function initials(name: string) {
@@ -124,9 +91,8 @@ export default function BrandLogo({
   variant?: "auto" | "tile" | "plain";
 }) {
   const [failed, setFailed] = useState(false);
-  const iconSlug = SIMPLEICON_SLUG[slug];
   const tint = ACCENT_TINT[slug] ?? "#1c1c20";
-  const src = iconSlug ? `https://cdn.simpleicons.org/${iconSlug}/111111` : null;
+  const src = NO_LOGO.has(slug) ? null : `${LOGO_BASE}/${slug}.png`;
 
   if (!src || failed) {
     return (
@@ -145,18 +111,21 @@ export default function BrandLogo({
         src={src}
         alt={name}
         onError={() => setFailed(true)}
-        className={`object-contain dark:invert ${className}`}
+        className={`object-contain ${className}`}
+        loading="lazy"
       />
     );
   }
 
   return (
-    <div className={`grid place-items-center rounded-lg border border-line bg-bg-elevated shadow-[inset_0_1px_0_rgb(255_255_255/0.55)] dark:shadow-none ${className}`}>
+    <div
+      className={`grid place-items-center rounded-lg border border-line bg-white shadow-[inset_0_1px_0_rgb(255_255_255/0.55)] dark:bg-bg-elevated dark:shadow-none ${className}`}
+    >
       <img
         src={src}
         alt={name}
         onError={() => setFailed(true)}
-        className="h-[60%] w-[60%] object-contain dark:invert"
+        className="h-[64%] w-[64%] object-contain"
         loading="lazy"
       />
     </div>

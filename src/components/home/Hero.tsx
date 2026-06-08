@@ -12,13 +12,12 @@ export default function Hero() {
         src="/banners/hero.jpg"
         mobileSrc="/banners/hero-mobile.jpg"
         alt="LORS premium car mats"
-        overlay={0.62}
+        overlay={0.66}
         overlayPreset="hero"
-        objectPosition="72% center"
-        mobileObjectPosition="64% center"
+        objectPosition="100% center"
+        mobileObjectPosition="72% center"
         priority
-        imageClassName="scale-[1.015] md:scale-100"
-        className="min-h-[590px] w-full md:min-h-[650px] lg:min-h-[690px]"
+        className="min-h-[590px] w-full md:min-h-[650px] lg:min-h-[700px]"
       >
         <div className="container-app flex min-h-[590px] flex-col justify-end pb-12 pt-24 text-[rgb(var(--dark-fg))] md:min-h-[650px] md:justify-center md:py-20 lg:min-h-[690px]">
           <div className="max-w-[580px]">

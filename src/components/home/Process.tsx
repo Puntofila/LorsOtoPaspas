@@ -22,25 +22,21 @@ export default function Process() {
         </div>
       </Reveal>
 
-      <div className="relative mt-14">
-        {/* connecting line */}
-        <div
-          className="pointer-events-none absolute inset-x-0 top-7 hidden h-px bg-gradient-to-r from-accent/0 via-accent/40 to-accent-2/0 md:block"
-          aria-hidden
-        />
-        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
-          {STEPS.map((s, i) => (
-            <Reveal key={s.n} delay={i * 90}>
-              <div className="relative border-t border-line pt-7">
-                <div className="grid h-14 w-14 place-items-center rounded-2xl border border-line-strong bg-bg-elevated shadow-card">
-                  <span className="gradient-text font-display text-xl font-bold">{s.n}</span>
+      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {STEPS.map((s, i) => (
+          <Reveal key={s.n} delay={i * 90}>
+            <div className="group h-full rounded-2xl border border-line bg-bg-elevated/70 p-6 shadow-card backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-glow-sm">
+              <div className="flex items-center gap-3">
+                <div className="grid h-12 w-12 flex-none place-items-center rounded-xl border border-accent/30 bg-gradient-to-br from-accent/20 via-bg-elevated to-transparent">
+                  <span className="gradient-text font-display text-lg font-bold">{s.n}</span>
                 </div>
-                <h3 className="mt-5 text-lg font-semibold">{t(s.titleKey)}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-fg-soft">{t(s.descKey)}</p>
+                <span className="h-px flex-1 bg-gradient-to-r from-accent/30 to-transparent" aria-hidden />
               </div>
-            </Reveal>
-          ))}
-        </div>
+              <h3 className="mt-5 text-lg font-semibold">{t(s.titleKey)}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-fg-soft">{t(s.descKey)}</p>
+            </div>
+          </Reveal>
+        ))}
       </div>
     </section>
   );

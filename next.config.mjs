@@ -9,7 +9,7 @@ const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://cdn.simpleicons.org https://lh3.googleusercontent.com https://*.public.blob.vercel-storage.com",
+  "img-src 'self' data: blob: https://raw.githubusercontent.com https://lh3.googleusercontent.com https://*.public.blob.vercel-storage.com",
   "font-src 'self' data:",
   "connect-src 'self'",
   "frame-ancestors 'none'",
@@ -35,7 +35,7 @@ const nextConfig = {
   poweredByHeader: false,
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "cdn.simpleicons.org" },
+      { protocol: "https", hostname: "raw.githubusercontent.com" },
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
     ],
   },

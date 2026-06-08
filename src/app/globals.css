@@ -77,6 +77,14 @@ body {
   min-width: 320px;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
 .dark body {
   background:
     radial-gradient(120% 55% at 50% -8%, rgb(var(--gold) / 0.12), transparent 58%),
@@ -196,10 +204,10 @@ html, html.dark { color-scheme: dark; }
 .reveal.is-in { animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 @keyframes page-enter {
-  0% { opacity: 0; transform: translateY(10px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
-.page-enter { animation: page-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.page-enter { animation: page-enter 0.5s ease-out both; }
 
 @media (scripting: none) {
   .reveal { opacity: 1; }
