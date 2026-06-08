@@ -17,9 +17,9 @@ export default function Hero() {
         objectPosition="100% center"
         mobileObjectPosition="72% center"
         priority
-        className="min-h-[590px] w-full md:min-h-[650px] lg:min-h-[700px]"
+        className="min-h-[520px] w-full md:min-h-[560px] lg:min-h-[600px]"
       >
-        <div className="container-app flex min-h-[590px] flex-col justify-end pb-12 pt-24 text-[rgb(var(--dark-fg))] md:min-h-[650px] md:justify-center md:py-20 lg:min-h-[690px]">
+        <div className="container-app flex min-h-[520px] flex-col justify-end pb-12 pt-24 text-[rgb(var(--dark-fg))] md:min-h-[560px] md:justify-center md:py-16 lg:min-h-[600px]">
           <div className="max-w-[580px]">
             <span className="inline-flex max-w-full flex-wrap items-center gap-2 text-[10px] font-semibold uppercase leading-relaxed tracking-[0.16em] text-[rgb(var(--accent-2))] md:text-xs md:tracking-[0.26em]">
               <span className="h-px w-8 bg-[rgb(var(--gold))]" />
